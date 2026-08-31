@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Create Analyst — KALOSAFE{% endblock %}
+{% block content %}
+<div class="two-col">
+<div class="panel">
+  <h2>Create Analyst Account</h2>
+  <p class="muted">Choose the codename manually — it must begin with "A" (e.g. Amber, Aster, Atlas). Communicate the password to the Analyst separately, out of band. Analysts cannot change their password from within the application.</p>
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Codename</label>
+    <input type="text" name="codename" placeholder="A..." required>
+    <label>Password</label>
+    <input type="password" name="password" minlength="10" required>
+    <button class="btn btn-primary" type="submit">Create Analyst</button>
+  </form>
+</div>
+<div class="panel">
+  <h3>Existing Analysts</h3>
+  <table>
+    <tr><th>Codename</th><th>Status</th></tr>
+    {% for a in analysts %}<tr><td class="mono">{{ a.codename }}</td><td>{{ "Active" if a.active else "Disabled" }}</td></tr>{% endfor %}
+  </table>
+</div>
+</div>
+{% endblock %}

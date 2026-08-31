@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Manage Watchlist — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Watchlist Management</h2>
+<p class="muted">The public watchlist deliberately shows names only. All other case detail stays internal.</p>
+<div class="panel">
+  <h3>Add Entry</h3>
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="form_action" value="add">
+    <label>Display Name</label>
+    <input type="text" name="display_name" required>
+    <label>Linked Case (optional, internal only)</label>
+    <select name="case_id">
+      <option value="">— none —</option>
+      {% for c in approved_poi %}<option value="{{ c.id }}">{{ c.case_number }} — {{ c.subject_name }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-primary" type="submit">Add to Watchlist</button>
+  </form>
+</div>
+<div class="panel">
+  <h3>Current Entries</h3>
+  <table>
+    <tr><th>Name</th><th>Added</th><th></th></tr>
+    {% for e in entries %}
+    <tr>
+      <td>{{ e.display_name }}</td><td class="mono">{{ e.added_at }}</td>
+      <td>
+        <form method="POST" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="form_action" value="remove">
+          <input type="hidden" name="watchlist_id" value="{{ e.id }}">
+          <button class="btn btn-small btn-danger" type="submit">Remove</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}<tr><td colspan="3" class="muted">No entries.</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}

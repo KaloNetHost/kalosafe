@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Rejected Reports Archive — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Rejected Reports Archive</h2>
+<p class="muted">Rejected reports are retained securely for future reference and never appear in active case lists.</p>
+<table>
+<tr><th>Ref</th><th>Subject</th><th>Submitted</th><th>Reviewed</th><th>Note</th></tr>
+{% for r in reports %}
+<tr><td class="mono">{{ r.ref_number }}</td><td>{{ r.subject_name }}</td><td class="mono">{{ r.submitted_at }}</td><td class="mono">{{ r.reviewed_at }}</td><td>{{ r.review_note }}</td></tr>
+{% else %}<tr><td colspan="5" class="muted">No rejected reports.</td></tr>{% endfor %}
+</table>
+{% endblock %}

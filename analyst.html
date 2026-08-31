@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Analyst Dashboard — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Analyst Dashboard</h2>
+<div class="grid grid-2">
+  <div class="panel">
+    <h3>My Assigned Cases</h3>
+    {% for c in assigned %}
+      <div class="case-row"><div class="left"><span class="mono">{{ c.case_number }}</span> {{ c.subject_name }} <span class="badge badge-{{ c.classification|lower }}">{{ class_labels[c.classification] }}</span></div>
+      <a class="btn btn-small" href="{{ url_for('case_detail', case_id=c.id) }}">Open</a></div>
+    {% else %}<p class="muted">No cases currently assigned to you.</p>{% endfor %}
+  </div>
+  <div class="panel">
+    <h3>Priority Level 3 Cases</h3>
+    {% for c in priority3 %}
+      <div class="case-row"><div class="left"><span class="mono">{{ c.case_number }}</span> {{ c.subject_name }} <span class="badge badge-level3 mono">PRIORITY</span></div>
+      <a class="btn btn-small" href="{{ url_for('case_detail', case_id=c.id) }}">View</a></div>
+    {% else %}<p class="muted">No active Level 3 cases.</p>{% endfor %}
+  </div>
+  <div class="panel">
+    <h3>My Attachment Requests</h3>
+    {% for r in my_requests %}
+      <div class="note-block mono">{{ r.case_number }} — {{ r.status }}</div>
+    {% else %}<p class="muted">No requests submitted.</p>{% endfor %}
+  </div>
+  <div class="panel">
+    <h3>Quick Actions</h3>
+    <p><a class="btn" href="{{ url_for('case_list') }}">View All Active Cases</a></p>
+    <p><a class="btn" href="{{ url_for('messages_hub') }}">Messages</a></p>
+  </div>
+</div>
+{% endblock %}

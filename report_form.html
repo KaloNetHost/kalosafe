@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Submit a Report — KALOSAFE{% endblock %}
+{% block content %}
+<div class="panel narrow">
+  <div class="stamp">ANONYMOUS SUBMISSION &middot; NO ACCOUNT REQUIRED &middot; REPORTER IDENTITY IS NOT COLLECTED</div>
+  <h2>Anonymous Report</h2>
+  <p class="muted">Please provide as much accurate detail as you can. Fields marked are optional — we do not require your name, email, Discord account, or any way of contacting you.</p>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+
+    <label>Subject's name / Discord username</label>
+    <input type="text" name="subject_name" required>
+
+    <label>Subject's Discord User ID (optional)</label>
+    <input type="text" name="discord_id" placeholder="e.g. 123456789012345678">
+
+    <label>Category</label>
+    <select name="category">
+      <option value="Harassment">Harassment</option>
+      <option value="Safeguarding Concern">Safeguarding Concern</option>
+      <option value="Threats / Violence">Threats / Violence</option>
+      <option value="Impersonation">Impersonation</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <label>Approximate date/time of incident</label>
+    <input type="datetime-local" name="incident_datetime">
+
+    <label>Description of incident</label>
+    <textarea name="description" required placeholder="What happened? Please be as specific as possible."></textarea>
+
+    <label>Evidence uploads (optional — images, PDFs, or text files)</label>
+    <input type="file" name="evidence" multiple accept=".png,.jpg,.jpeg,.gif,.pdf,.txt">
+
+    <label>Additional information (optional)</label>
+    <textarea name="additional_info" placeholder="Anything else that might help an analyst assess this report."></textarea>
+
+    <button class="btn btn-primary" type="submit">Submit Report</button>
+  </form>
+</div>
+{% endblock %}

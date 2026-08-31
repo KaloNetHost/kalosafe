@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Manager Dashboard — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Manager Dashboard</h2>
+<div class="grid grid-2">
+  <div class="panel">
+    <h3>Incoming Anonymous Reports</h3>
+    <p class="mono">{{ incoming|length }} pending</p>
+    <a class="btn" href="{{ url_for('reports_queue') }}">Open Review Queue</a>
+  </div>
+  <div class="panel">
+    <h3>Active Cases</h3>
+    {% for c in active %}
+      <div class="case-row"><div class="left"><span class="mono">{{ c.case_number }}</span> {{ c.subject_name }} <span class="badge badge-{{ c.classification|lower }}">{{ class_labels[c.classification] }}</span></div>
+      <a class="btn btn-small" href="{{ url_for('case_detail', case_id=c.id) }}">Open</a></div>
+    {% else %}<p class="muted">No active cases.</p>{% endfor %}
+  </div>
+  <div class="panel">
+    <h3>PoI Approvals Pending</h3>
+    {% for p in pending_poi %}
+      <div class="note-block mono">{{ p.case_number }} — {{ p.requested_designation.replace('_',' ') }}
+      <a href="{{ url_for('case_detail', case_id=p.case_id) }}">Review</a></div>
+    {% else %}<p class="muted">Nothing pending.</p>{% endfor %}
+  </div>
+  <div class="panel">
+    <h3>Attachment Requests</h3>
+    {% for a in pending_attach %}
+      <div class="note-block mono">{{ a.case_number }} — {{ a.codename if a.codename else 'Analyst' }}
+      <a href="{{ url_for('case_detail', case_id=a.case_id) }}">Review</a></div>
+    {% else %}<p class="muted">None pending.</p>{% endfor %}
+  </div>
+  <div class="panel">
+    <h3>Deferred Reports</h3>
+    {% for d in deferred %}<div class="note-block mono">{{ d.ref_number }} — {{ d.subject_name }}</div>
+    {% else %}<p class="muted">None deferred.</p>{% endfor %}
+  </div>
+  <div class="panel">
+    <h3>Quick Actions</h3>
+    <p><a class="btn" href="{{ url_for('reports_rejected') }}">Rejected Archive</a></p>
+    <p><a class="btn" href="{{ url_for('create_analyst') }}">Create Analyst Account</a></p>
+    <p><a class="btn" href="{{ url_for('watchlist_manage') }}">Manage Watchlist</a></p>
+  </div>
+</div>
+{% endblock %}

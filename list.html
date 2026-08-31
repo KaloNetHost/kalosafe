@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Cases — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Active Cases</h2>
+<p class="muted">Visibility and access are enforced server-side according to your rank and classification restrictions.</p>
+<div class="card-list">
+  {% for c in cases %}
+  <div class="case-row">
+    <div class="left">
+      <span class="mono">{{ c.case_number }}</span>
+      <span>{{ c.subject_name }}</span>
+      <span class="badge badge-{{ c.classification|lower }}">{{ class_labels[c.classification] }}</span>
+      {% if c.is_priority3 %}<span class="badge badge-level3 mono">PRIORITY</span>{% endif %}
+      <span class="muted mono">{{ c.status }}</span>
+    </div>
+    <div>
+      {% if c.can_open %}
+        <a class="btn btn-small" href="{{ url_for('case_detail', case_id=c.id) }}">Open</a>
+      {% elif c.unassigned %}
+        <form method="POST" action="{{ url_for('attach_request', case_id=c.id) }}" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-small" type="submit">Request to Attach</button>
+        </form>
+        <a class="btn btn-small" href="{{ url_for('case_detail', case_id=c.id) }}">View</a>
+      {% else %}
+        <a class="btn btn-small" href="{{ url_for('case_detail', case_id=c.id) }}">View</a>
+      {% endif %}
+    </div>
+  </div>
+  {% else %}
+  <p class="muted">No cases currently visible.</p>
+  {% endfor %}
+</div>
+{% endblock %}

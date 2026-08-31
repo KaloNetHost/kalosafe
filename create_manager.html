@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Create Manager — KALOSAFE{% endblock %}
+{% block content %}
+<div class="two-col">
+<div class="panel">
+  <h2>Create Manager Account</h2>
+  <div class="stamp">COORDINATOR ACCESS ONLY</div>
+  <p class="muted">Codenames must begin with "M" (e.g. Moonlight, Meridian, Monarch). Only the Coordinator may create Manager accounts.</p>
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Codename</label>
+    <input type="text" name="codename" placeholder="M..." required>
+    <label>Password</label>
+    <input type="password" name="password" minlength="10" required>
+    <button class="btn btn-primary" type="submit">Create Manager</button>
+  </form>
+</div>
+<div class="panel">
+  <h3>Existing Managers</h3>
+  <table>
+    <tr><th>Codename</th><th>Status</th></tr>
+    {% for m in managers %}<tr><td class="mono">{{ m.codename }}</td><td>{{ "Active" if m.active else "Disabled" }}</td></tr>{% endfor %}
+  </table>
+</div>
+</div>
+{% endblock %}

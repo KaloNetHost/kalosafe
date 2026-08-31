@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Personnel Directory — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Personnel Directory</h2>
+<div class="stamp">COORDINATOR ACCESS ONLY &middot; REAL IDENTITY FIELD RESTRICTED TO THIS VIEW</div>
+<table>
+<tr><th>Codename</th><th>Rank</th><th>Status</th><th>Real Identity</th><th>Set</th></tr>
+{% for u in users %}
+<tr>
+  <td class="mono">{{ u.codename }}</td><td class="mono">{{ u.rank }}</td><td>{{ "Active" if u.active else "Disabled" }}</td>
+  <td class="mono">{{ u.real_identity or "— not recorded —" }}</td>
+  <td>
+    <form method="POST" action="{{ url_for('set_identity', user_id=u.id) }}" style="display:flex; gap:6px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="text" name="real_identity" placeholder="optional" style="width:140px;">
+      <button class="btn btn-small" type="submit">Save</button>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

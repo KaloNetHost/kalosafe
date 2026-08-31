@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Search — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Case Search</h2>
+<form method="GET">
+  <input type="text" name="q" value="{{ q }}" placeholder="Case number, subject name, Discord username/ID, classification, status...">
+  <button class="btn btn-primary" type="submit">Search</button>
+</form>
+{% if q %}
+<h3>Results for "{{ q }}"</h3>
+<div class="card-list">
+  {% for c in results %}
+  <div class="case-row">
+    <div class="left">
+      <span class="mono">{{ c.case_number }}</span>
+      <span>{{ c.subject_name }}</span>
+      <span class="badge badge-{{ c.classification|lower }}">{{ class_labels[c.classification] }}</span>
+    </div>
+    {% if c.can_open %}<a class="btn btn-small" href="{{ url_for('case_detail', case_id=c.id) }}">Open</a>
+    {% else %}<a class="btn btn-small" href="{{ url_for('case_detail', case_id=c.id) }}">View</a>{% endif %}
+  </div>
+  {% else %}<p class="muted">No visible results. Results respect your access level — restricted cases will never appear here even if they match.</p>{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

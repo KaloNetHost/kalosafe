@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Review Queue — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Manager Review Queue</h2>
+<p class="muted">Anonymous reports awaiting review. See also the <a href="{{ url_for('reports_rejected') }}">Rejected Reports Archive</a>.</p>
+{% for r in reports %}
+<div class="panel">
+  <span class="mono">{{ r.ref_number }}</span> · <span class="badge mono">{{ r.category or 'UNSPECIFIED' }}</span>
+  <span class="muted mono">{{ r.submitted_at }}</span>
+  <p><strong>Subject:</strong> {{ r.subject_name }} {% if r.discord_id %}<span class="mono muted">({{ r.discord_id }})</span>{% endif %}</p>
+  <p>{{ r.description }}</p>
+  {% if r.additional_info %}<p class="muted">{{ r.additional_info }}</p>{% endif %}
+  {% set evs = evidence_by_report.get(r.id, []) %}
+  {% if evs %}
+  <p class="muted mono">Attachments:
+    {% for e in evs %}<a href="{{ url_for('report_evidence_download', evidence_id=e.id) }}">file {{ loop.index }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+  </p>
+  {% endif %}
+
+  <form method="POST" action="{{ url_for('report_accept', report_id=r.id) }}" style="display:inline-block; margin-right:10px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <select name="classification">
+      <option value="LEVEL1">Level 1 — Green</option>
+      <option value="LEVEL2">Level 2 — Orange</option>
+      <option value="LEVEL3">Level 3 — Red</option>
+      <option value="LEVELX">Level X — Manager Restricted</option>
+    </select>
+    <button class="btn btn-primary btn-small" type="submit">Accept &amp; Assign</button>
+  </form>
+
+  <form method="POST" action="{{ url_for('report_postpone', report_id=r.id) }}" style="display:inline-block; margin-right:10px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-small" type="submit">Postpone &amp; Defer</button>
+  </form>
+
+  <form method="POST" action="{{ url_for('report_reject', report_id=r.id) }}" style="display:inline-block;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-small btn-danger" type="submit">Reject</button>
+  </form>
+</div>
+{% else %}
+<p class="muted">No pending reports.</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Messages — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Messages</h2>
+<div class="grid grid-2">
+  <div class="panel">
+    <h3>Global Channel</h3>
+    <a class="btn" href="{{ url_for('messages_global') }}">Open Global Chat</a>
+  </div>
+  <div class="panel">
+    <h3>Private Messages</h3>
+    {% for o in others %}
+      <div class="case-row"><div class="left"><span class="mono">{{ o.codename }}</span> <span class="muted mono">{{ o.rank }}</span></div>
+      <a class="btn btn-small" href="{{ url_for('messages_private', other_id=o.id) }}">Message</a></div>
+    {% endfor %}
+  </div>
+  <div class="panel">
+    <h3>Case Chats</h3>
+    {% for c in my_cases %}
+      <div class="case-row"><div class="left"><span class="mono">{{ c.case_number }}</span> {{ c.subject_name }}</div>
+      <a class="btn btn-small" href="{{ url_for('case_chat', case_id=c.id) }}">Open</a></div>
+    {% else %}<p class="muted">No case chats available.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Private Message — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Private Message — <span class="mono">{{ other.codename }}</span></h2>
+<div class="panel">
+  {% for m in messages %}
+    <div class="note-block"><span class="mono">{{ m.codename }}</span> — {{ m.content }} <span class="muted mono">{{ m.created_at }}</span></div>
+  {% else %}<p class="muted">No messages yet.</p>{% endfor %}
+</div>
+<form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <textarea name="content" required></textarea>
+  <button class="btn btn-primary" type="submit">Send</button>
+</form>
+{% endblock %}

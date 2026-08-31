@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Report Received — KALOSAFE{% endblock %}
+{% block content %}
+<div class="panel narrow" style="text-align:center;">
+  <div class="badge badge-confidential mono">SUBMITTED</div>
+  <h2>Your report has been received</h2>
+  <p class="muted">It will be reviewed by a Manager. Please keep the reference number below for your own records — KaloSafe cannot look up a report on your behalf, since no contact details are collected.</p>
+  <div class="stamp" style="font-size:1rem;">{{ ref }}</div>
+  <p><a class="btn" href="{{ url_for('landing') }}">Return Home</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}KALOSAFE — {{ code }}{% endblock %}
+{% block content %}
+<div class="panel narrow" style="margin: 60px auto; text-align:center;">
+  <div class="badge badge-restricted mono">ERROR {{ code }}</div>
+  <p style="margin-top:16px;">{{ message }}</p>
+  <a class="btn" href="{{ url_for('landing') }}">Return to KaloSafe</a>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Coordinator Dashboard — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Coordinator Dashboard</h2>
+<div class="grid grid-3">
+  <div class="panel"><h3 class="mono">{{ stats.managers }}</h3><p class="muted">Active Managers</p></div>
+  <div class="panel"><h3 class="mono">{{ stats.analysts }}</h3><p class="muted">Active Analysts</p></div>
+  <div class="panel"><h3 class="mono">{{ stats.open_cases }}</h3><p class="muted">Open Cases</p></div>
+  <div class="panel"><h3 class="mono">{{ stats.levelx }}</h3><p class="muted">Level X Cases</p></div>
+  <div class="panel"><h3 class="mono">{{ stats.deferred }}</h3><p class="muted">Deferred Reports</p></div>
+</div>
+<div class="grid grid-2">
+  <div class="panel">
+    <h3>Level X — Manager Restricted</h3>
+    {% for c in levelx_cases %}
+      <div class="case-row"><div class="left"><span class="mono">{{ c.case_number }}</span> {{ c.subject_name }} <span class="badge badge-levelx mono">LEVEL X</span></div>
+      <a class="btn btn-small" href="{{ url_for('case_detail', case_id=c.id) }}">Open</a></div>
+    {% else %}<p class="muted">None.</p>{% endfor %}
+  </div>
+  <div class="panel">
+    <h3>Deferred Reports</h3>
+    {% for d in deferred %}<div class="note-block mono">{{ d.ref_number }} — {{ d.subject_name }} <span class="muted">{{ d.review_note }}</span></div>
+    {% else %}<p class="muted">None deferred.</p>{% endfor %}
+  </div>
+  <div class="panel">
+    <h3>Recent Audit Activity</h3>
+    {% for a in recent_audit %}<div class="note-block mono">{{ a.ts }} — {{ a.user_codename }} — {{ a.action }}</div>{% endfor %}
+    <a class="btn btn-small" href="{{ url_for('audit_log_view') }}">Full Audit Log</a>
+  </div>
+  <div class="panel">
+    <h3>System Management</h3>
+    <p><a class="btn" href="{{ url_for('create_manager') }}">Create Manager Account</a></p>
+    <p><a class="btn" href="{{ url_for('personnel_directory') }}">Personnel Directory</a></p>
+    <p><a class="btn" href="{{ url_for('watchlist_manage') }}">Watchlist Management</a></p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>{% block title %}KALOSAFE{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="classified-strip"></div>
+<header class="topbar">
+  <a class="brand" href="{{ current_user and url_for('dashboard') or url_for('landing') }}">KALO<span class="dot">SAFE</span></a>
+  <nav>
+    {% if current_user %}
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('case_list') }}">Cases</a>
+      <a href="{{ url_for('search') }}">Search</a>
+      <a href="{{ url_for('messages_hub') }}">Messages</a>
+      {% if current_user['rank'] in ('MANAGER','COORDINATOR') %}
+        <a href="{{ url_for('reports_queue') }}">Review Queue</a>
+        <a href="{{ url_for('watchlist_manage') }}">Watchlist</a>
+      {% endif %}
+      {% if current_user['rank'] == 'COORDINATOR' %}
+        <a href="{{ url_for('audit_log_view') }}">Audit</a>
+        <a href="{{ url_for('personnel_directory') }}">Personnel</a>
+      {% endif %}
+      <span class="badge badge-rank-{{ current_user['rank']|lower }} mono">{{ current_user['codename'] }} · {{ current_user['rank'] }}</span>
+      <form method="POST" action="{{ url_for('logout') }}" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-small" type="submit">Logout</button>
+      </form>
+    {% else %}
+      <a href="{{ url_for('landing') }}">Home</a>
+      <a href="{{ url_for('watchlist_public') }}">Watchlist</a>
+      <a class="btn btn-small" href="{{ url_for('login') }}">Analyst Login</a>
+    {% endif %}
+  </nav>
+</header>
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        <div class="flash flash-{{ category }}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+  <div class="footer-note mono">KALOSAFE INTERNAL SYSTEM &middot; UNAUTHORISED ACCESS IS LOGGED &middot; {{ "CONFIDENTIAL" if current_user else "PUBLIC INTERFACE" }}</div>
+</div>
+</body>
+</html>

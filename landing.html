@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}KALOSAFE — Confidential Reporting &amp; Safeguarding{% endblock %}
+{% block content %}
+<div class="hero">
+  <div class="crest">KALOPSIA &middot; CONFIDENTIAL SAFEGUARDING UNIT</div>
+  <h1>KALOSAFE</h1>
+  <p>
+    KaloSafe provides a confidential reporting and safeguarding mechanism for the
+    Kalopsia community. Reports are reviewed by trained analysts under strict
+    access controls. You do not need an account to submit a report, and your
+    identity is never recorded.
+  </p>
+  <div class="actions">
+    <a class="btn btn-primary" href="{{ url_for('report') }}">Anonymous Report</a>
+    <a class="btn" href="{{ url_for('watchlist_public') }}">Watchlist</a>
+  </div>
+</div>
+{% endblock %}

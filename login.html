@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Analyst Login — KALOSAFE{% endblock %}
+{% block content %}
+<div class="panel narrow" style="margin: 40px auto;">
+  <div class="stamp">INTERNAL SYSTEM ACCESS &middot; AUTHORISED PERSONNEL ONLY</div>
+  <h2>Secure Login</h2>
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    <label>Codename</label>
+    <input type="text" name="codename" autocomplete="off" required>
+    <label>Password</label>
+    <input type="password" name="password" required>
+    <button class="btn btn-primary" type="submit">Login</button>
+  </form>
+</div>
+{% endblock %}

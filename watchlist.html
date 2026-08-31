@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Watchlist — KALOSAFE{% endblock %}
+{% block content %}
+<div class="panel narrow">
+  <h2>Watchlist</h2>
+  <p class="muted">The following individuals have been placed on the KaloSafe watchlist. No further details are published.</p>
+  {% if names %}
+  <ul>
+    {% for n in names %}<li class="mono">{{ n }}</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">There are currently no active watchlist entries.</p>
+  {% endif %}
+</div>
+{% endblock %}

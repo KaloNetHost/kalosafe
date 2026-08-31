@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}{{ case.case_number }} — KALOSAFE{% endblock %}
+{% block content %}
+<div class="two-col">
+<div>
+  <span class="badge badge-{{ case.classification|lower }}">{{ class_labels[case.classification] }}</span>
+  {% if case.designation %}<span class="badge badge-confidential mono">{{ case.designation.replace('_',' ') }}</span>{% endif %}
+  <span class="badge mono">{{ case.status }}</span>
+  <h2 class="mono">{{ case.case_number }}</h2>
+  <table style="margin-bottom:20px;">
+    <tr><th>Subject</th><td>{{ case.subject_name }}</td></tr>
+    <tr><th>Discord Username</th><td class="mono">{{ case.discord_username or "—" }}</td></tr>
+    <tr><th>Discord ID</th><td class="mono">{{ case.discord_id or "—" }}</td></tr>
+    <tr><th>Created</th><td class="mono">{{ case.created_at }}</td></tr>
+    <tr><th>Updated</th><td class="mono">{{ case.updated_at }}</td></tr>
+  </table>
+
+  <div class="panel">
+    <h3>Case Action</h3>
+    <form method="POST" action="{{ url_for('case_action', case_id=case.id) }}" id="actionForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <select name="action" id="actionSelect" onchange="document.getElementById('escalateBox').style.display = (this.value==='ESCALATE') ? 'block':'none'">
+        <option value="CONTINUE">Continue As Normal</option>
+        <option value="ESCALATE">Escalate</option>
+        <option value="REPORTED">Reported (Close)</option>
+        <option value="CASE_DROPPED">Case Dropped (Close)</option>
+      </select>
+      <div id="escalateBox" style="display:none;">
+        <label>Escalate to</label>
+        <select name="escalate_to">
+          {% if current_user['rank'] != 'ANALYST' %}<option value="MANAGER_CASE">Manager Case (Level X)</option>{% endif %}
+          <option value="PERSON_OF_INTEREST">Person of Interest</option>
+          <option value="MONITOR">Monitor</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" type="submit">Apply</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3>Person of Interest</h3>
+    {% for p in poi %}
+      <div class="note-block">
+        <span class="mono">{{ p.requested_designation.replace('_',' ') }}</span> —
+        <span class="badge {{ 'badge-level1' if p.status=='APPROVED' else ('badge-restricted' if p.status=='REJECTED' else 'badge-confidential') }} mono">{{ p.status }}</span>
+        <p>{{ p.reason }}</p>
+        <p class="muted mono">Proposed {{ p.created_at }}{% if p.decided_at %} · Decided {{ p.decided_at }}{% endif %}</p>
+      </div>
+      {% if p.status == 'PENDING' and current_user['rank'] in ('MANAGER','COORDINATOR') %}
+      <form method="POST" action="{{ url_for('poi_decide', poi_id=p.id) }}" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="decision" value="APPROVE">
+        <button class="btn btn-small btn-primary" type="submit">Approve</button>
+      </form>
+      <form method="POST" action="{{ url_for('poi_decide', poi_id=p.id) }}" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="decision" value="REJECT">
+        <button class="btn btn-small btn-danger" type="submit">Reject</button>
+      </form>
+      {% endif %}
+    {% else %}
+      <p class="muted">No Person of Interest recommendations on file.</p>
+    {% endfor %}
+    <hr style="border-color: var(--border);">
+    <form method="POST" action="{{ url_for('poi_recommend', case_id=case.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Recommend Designation</label>
+      <select name="designation">
+        <option value="PERSON_OF_INTEREST">Person of Interest</option>
+        <option value="MONITOR">Monitor</option>
+        <option value="EXTREME_POI">Extreme Person of Interest</option>
+      </select>
+      <label>Reason (recommendation only — not a finding of guilt)</label>
+      <textarea name="reason" required></textarea>
+      <button class="btn" type="submit">Submit Recommendation</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3>Evidence</h3>
+    {% for e in evidence %}
+      <div class="evidence-thumb" style="margin-bottom:10px;">
+        <span class="mono">{{ e.original_filename }}</span> · uploaded by {{ e.codename }} · <span class="muted mono">{{ e.uploaded_at }}</span><br>
+        {% if e.watermarked_path %}<a href="{{ url_for('evidence_watermarked', evidence_id=e.id) }}">View Analyst Copy (watermarked)</a>{% endif %}
+        {% if can_original %} · <a href="{{ url_for('evidence_original', evidence_id=e.id) }}">Download Original (Manager+)</a>{% endif %}
+      </div>
+    {% else %}
+      <p class="muted">No evidence uploaded.</p>
+    {% endfor %}
+    <form method="POST" action="{{ url_for('evidence_upload', case_id=case.id) }}" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Upload Evidence</label>
+      <input type="file" name="file" accept=".png,.jpg,.jpeg,.gif,.pdf,.txt" required>
+      <button class="btn" type="submit">Upload</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3>Internal Notes</h3>
+    {% for n in notes %}
+      <div class="note-block"><span class="mono">{{ n.codename }}</span> — {{ n.content }}<div class="muted mono">{{ n.created_at }}</div></div>
+    {% else %}<p class="muted">No notes yet.</p>{% endfor %}
+    <form method="POST" action="{{ url_for('case_add_note', case_id=case.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <textarea name="content" placeholder="Add an internal note..." required></textarea>
+      <button class="btn" type="submit">Add Note</button>
+    </form>
+  </div>
+
+  {% if contributions %}
+  <div class="panel">
+    <h3>Analyst Contributions (Manager+ only)</h3>
+    {% for c in contributions %}
+      <div class="note-block"><span class="mono">{{ c.codename }}</span> — {{ c.content }}<div class="muted mono">{{ c.created_at }}</div></div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<div>
+  <div class="panel">
+    <h3>Assignment</h3>
+    <p class="muted">Assigned Analyst / Supervising Manager identities are visible here by codename only.</p>
+  </div>
+  <div class="panel">
+    <h3>Attachment Requests</h3>
+    {% for ar in attach_reqs %}
+      <div class="note-block">
+        <span class="mono">{{ ar.codename }}</span> — <span class="badge mono">{{ ar.status }}</span>
+        {% if ar.status == 'PENDING' and current_user['rank'] in ('MANAGER','COORDINATOR') %}
+        <form method="POST" action="{{ url_for('attach_decide', req_id=ar.id) }}" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="decision" value="APPROVE">
+          <button class="btn btn-small btn-primary" type="submit">Approve</button>
+        </form>
+        <form method="POST" action="{{ url_for('attach_decide', req_id=ar.id) }}" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="decision" value="DENY">
+          <button class="btn btn-small btn-danger" type="submit">Deny</button>
+        </form>
+        {% endif %}
+      </div>
+    {% else %}<p class="muted">None.</p>{% endfor %}
+  </div>
+  <div class="panel">
+    <h3>Case Chat</h3>
+    <a class="btn btn-small" href="{{ url_for('case_chat', case_id=case.id) }}">Open Case Chat</a>
+  </div>
+</div>
+</div>
+{% endblock %}

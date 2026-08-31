@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ case.case_number }} — KALOSAFE{% endblock %}
+{% block content %}
+<div class="panel narrow">
+  <span class="badge badge-{{ case.classification|lower }}">{{ class_labels[case.classification] }}</span>
+  <h2 class="mono">{{ case.case_number }}</h2>
+  <p><strong>Subject:</strong> {{ case.subject_name }}</p>
+  <p class="muted">You do not have access to open this case. Its existence and classification are shown per KaloSafe's tiered visibility rules; contents, evidence, and notes remain restricted to the assigned Analyst and Manager+.</p>
+  {% if can_contribute %}
+  <hr style="border-color: var(--border);">
+  <h3>Contribute Information</h3>
+  <p class="muted">You may submit relevant information without gaining access to this case's contents.</p>
+  <form method="POST" action="{{ url_for('case_contribute', case_id=case.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <textarea name="content" placeholder="Relevant information for the assigned team..." required></textarea>
+    <button class="btn btn-primary" type="submit">Submit Contribution</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

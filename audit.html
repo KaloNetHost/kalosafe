@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Audit Log — KALOSAFE{% endblock %}
+{% block content %}
+<h2>Audit Log</h2>
+<form method="GET" class="panel">
+  <div class="grid grid-3">
+    <div><label>Codename</label><input type="text" name="codename" value="{{ filters.codename }}"></div>
+    <div><label>Action</label><input type="text" name="action" value="{{ filters.action }}"></div>
+    <div><label>Case Ref</label><input type="text" name="case_ref" value="{{ filters.case_ref }}"></div>
+    <div><label>From Date</label><input type="text" name="date_from" placeholder="YYYY-MM-DD" value="{{ filters.date_from }}"></div>
+    <div><label>To Date</label><input type="text" name="date_to" placeholder="YYYY-MM-DD" value="{{ filters.date_to }}"></div>
+  </div>
+  <button class="btn btn-primary" type="submit">Filter</button>
+</form>
+<table>
+<tr><th>Time (UTC)</th><th>Codename</th><th>Rank</th><th>Action</th><th>Case</th><th>Target</th><th>Result</th></tr>
+{% for a in rows %}
+<tr>
+  <td class="mono">{{ a.ts }}</td><td class="mono">{{ a.user_codename }}</td><td class="mono">{{ a.user_rank }}</td>
+  <td class="mono">{{ a.action }}</td><td class="mono">{{ a.case_ref or '' }}</td><td class="mono">{{ a.target or '' }}</td><td class="mono">{{ a.result }}</td>
+</tr>
+{% else %}<tr><td colspan="7" class="muted">No matching entries.</td></tr>{% endfor %}
+</table>
+<p class="muted">Audit entries are immutable — there is no edit or delete function anywhere in the system.</p>
+{% endblock %}
